@@ -1,0 +1,22 @@
+http:
+  addr: :9999
+rtmp:
+  addr: :1935
+srt:
+  addr: :1936
+streams:
+  - streamId: test1
+    input: rtsp://username:password@ip:port/xx
+  - streamId: test2
+    input: rtsp://username:password@ip:port/xx
+    type: 2 #1 is the native RTSP stream default 1, 2 is the ffmpeg stream, output with a unified format of coping video encoding and changed audio to OPUS, and 3 is the transcoding mode
+  - srcStreamId: test1
+    streamId: test0
+    codecs: "-c:v libaom-av1 -g 50 -c:a libopus -ar 48k -ac 2 -cpu-used 6 -row-mt 1 -tile-columns 2 -tile-rows 2 -pix_fmt yuv420p"
+    filters: "scale=1280:720"
+    output: rtmp://127.0.0.1:1935/live/test0
+    type: 3
+records:
+  - streamId: ^test.+
+    segmentDuration: 60s
+    fileFolder: record
